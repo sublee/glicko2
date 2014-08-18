@@ -167,7 +167,7 @@ class Glicko2(object):
                 self.rate(rating2, [(DRAW if drawn else LOSS, rating1)]))
 
     def quality_1vs1(self, rating1, rating2):
-        expected_score1 = self.expect_score(rating1, rating2, self.g(rating1))
-        expected_score2 = self.expect_score(rating2, rating1, self.g(rating2))
+        expected_score1 = self.expect_score(rating1, rating2, self.reduce_impact(rating1))
+        expected_score2 = self.expect_score(rating2, rating1, self.reduce_impact(rating2))
         expected_score = (expected_score1 + expected_score2) / 2
         return 2 * (0.5 - abs(0.5 - expected_score))
