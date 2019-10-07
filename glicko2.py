@@ -136,31 +136,36 @@ class Glicko2(object):
         d_square_inv = 0
         variance_inv = 0
         difference = 0
-        for actual_score, other_rating in series:
-            other_rating = self.scale_down(other_rating)
-            impact = self.reduce_impact(other_rating)
-            expected_score = self.expect_score(rating, other_rating, impact)
-            variance_inv += impact ** 2 * expected_score * (1 - expected_score)
-            difference += impact * (actual_score - expected_score)
-            d_square_inv += (
-                expected_score * (1 - expected_score) *
-                (Q ** 2) * (impact ** 2))
-        difference /= variance_inv
-        variance = 1. / variance_inv
-        denom = rating.phi ** -2 + d_square_inv
-        mu = rating.mu + Q / denom * (difference / variance_inv)
-        phi = math.sqrt(1 / denom)
-        # Step 5. Determine the new value, Sigma', ot the sigma. This
-        #         computation requires iteration.
-        sigma = self.determine_sigma(rating, difference, variance)
-        # Step 6. Update the rating deviation to the new pre-rating period
-        #         value, Phi*.
-        phi_star = math.sqrt(phi ** 2 + sigma ** 2)
-        # Step 7. Update the rating and RD to the new values, Mu' and Phi'.
-        phi = 1 / math.sqrt(1 / phi_star ** 2 + 1 / variance)
-        mu = rating.mu + phi ** 2 * (difference / variance)
-        # Step 8. Convert ratings and RD's back to original scale.
-        return self.scale_up(self.create_rating(mu, phi, sigma))
+        if len(series) > 0:
+            for actual_score, other_rating in series:
+                other_rating = self.scale_down(other_rating)
+                impact = self.reduce_impact(other_rating)
+                expected_score = self.expect_score(rating, other_rating, impact)
+                variance_inv += impact ** 2 * expected_score * (1 - expected_score)
+                difference += impact * (actual_score - expected_score)
+                d_square_inv += (
+                    expected_score * (1 - expected_score) *
+                    (Q ** 2) * (impact ** 2))
+            difference /= variance_inv
+            variance = 1. / variance_inv
+            denom = rating.phi ** -2 + d_square_inv
+            mu = rating.mu + Q / denom * (difference / variance_inv)
+            phi = math.sqrt(1 / denom)
+            # Step 5. Determine the new value, Sigma', ot the sigma. This
+            #         computation requires iteration.
+            sigma = self.determine_sigma(rating, difference, variance)
+            # Step 6. Update the rating deviation to the new pre-rating period
+            #         value, Phi*.
+            phi_star = math.sqrt(phi ** 2 + sigma ** 2)
+            # Step 7. Update the rating and RD to the new values, Mu' and Phi'.
+            phi = 1 / math.sqrt(1 / phi_star ** 2 + 1 / variance)
+            mu = rating.mu + phi ** 2 * (difference / variance)
+            # Step 8. Convert ratings and RD's back to original scale.
+            return self.scale_up(self.create_rating(mu, phi, sigma))
+        else:
+            # If the team didn't play in the series, do only Step 6
+            phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
+            return self.scale_up(self.create_rating(rating.mu, phi_star, rating.sigma))
 
     def rate_1vs1(self, rating1, rating2, drawn=False):
         return (self.rate(rating1, [(DRAW if drawn else WIN, rating2)]),
