@@ -148,7 +148,6 @@ class Glicko2(object):
         difference /= variance_inv
         variance = 1. / variance_inv
         denom = rating.phi ** -2 + d_square_inv
-        mu = rating.mu + Q / denom * (difference / variance_inv)
         phi = math.sqrt(1 / denom)
         # Step 5. Determine the new value, Sigma', ot the sigma. This
         #         computation requires iteration.
