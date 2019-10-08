@@ -165,7 +165,12 @@ class Glicko2(object):
         else:
             # If the team didn't play in the series, do only Step 6
             phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
+        if not series:
+            # If the team didn't play in the series, do only Step 6
+            phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
             return self.scale_up(self.create_rating(rating.mu, phi_star, rating.sigma))
+
+        for actual_score ...
 
     def rate_1vs1(self, rating1, rating2, drawn=False):
         return (self.rate(rating1, [(DRAW if drawn else WIN, rating2)]),
