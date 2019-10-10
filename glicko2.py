@@ -136,6 +136,10 @@ class Glicko2(object):
         d_square_inv = 0
         variance_inv = 0
         difference = 0
+        if not series:
+            # If the team didn't play in the series, do only Step 6
+            phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
+            return self.scale_up(self.create_rating(rating.mu, phi_star, rating.sigma))
         for actual_score, other_rating in series:
             other_rating = self.scale_down(other_rating)
             impact = self.reduce_impact(other_rating)
@@ -148,7 +152,6 @@ class Glicko2(object):
         difference /= variance_inv
         variance = 1. / variance_inv
         denom = rating.phi ** -2 + d_square_inv
-        mu = rating.mu + Q / denom * (difference / variance_inv)
         phi = math.sqrt(1 / denom)
         # Step 5. Determine the new value, Sigma', ot the sigma. This
         #         computation requires iteration.
