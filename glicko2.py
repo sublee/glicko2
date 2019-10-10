@@ -139,6 +139,9 @@ class Glicko2(object):
         if not series:
             # If the team didn't play in the series, do only Step 6
             phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
+        if not series:
+            # If the team didn't play in the series, do only Step 6
+            phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
             return self.scale_up(self.create_rating(rating.mu, phi_star, rating.sigma))
         for actual_score, other_rating in series:
             other_rating = self.scale_down(other_rating)
@@ -165,6 +168,8 @@ class Glicko2(object):
         mu = rating.mu + phi ** 2 * (difference / variance)
         # Step 8. Convert ratings and RD's back to original scale.
         return self.scale_up(self.create_rating(mu, phi, sigma))
+
+        for actual_score ...
 
     def rate_1vs1(self, rating1, rating2, drawn=False):
         return (self.rate(rating1, [(DRAW if drawn else WIN, rating2)]),
