@@ -136,6 +136,10 @@ class Glicko2(object):
         d_square_inv = 0
         variance_inv = 0
         difference = 0
+        if not series:
+            # If the team didn't play in the series, do only Step 6
+            phi_star = math.sqrt(rating.phi ** 2 + rating.sigma ** 2)
+            return self.scale_up(self.create_rating(rating.mu, phi_star, rating.sigma))
         for actual_score, other_rating in series:
             other_rating = self.scale_down(other_rating)
             impact = self.reduce_impact(other_rating)
