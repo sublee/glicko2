@@ -26,9 +26,6 @@ PHI = 350
 SIGMA = 0.06
 TAU = 1.0
 EPSILON = 0.000001
-#: A constant which is used to standardize the logistic function to
-#: `1/(1+exp(-x))` from `1/(1+10^(-r/400))`
-Q = math.log(10) / 400
 
 
 class Rating(object):
