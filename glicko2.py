@@ -10,15 +10,14 @@
 """
 import math
 
-__version__ = "0.0.dev"
-
+__version__ = '0.0.dev'
 
 #: The actual score for win
-WIN = 1.0
+WIN = 1.
 #: The actual score for draw
 DRAW = 0.5
 #: The actual score for loss
-LOSS = 0.0
+LOSS = 0.
 
 
 MU = 1500
@@ -37,7 +36,7 @@ class Rating(object):
     def __repr__(self):
         c = type(self)
         args = (c.__module__, c.__name__, self.mu, self.phi, self.sigma)
-        return "%s.%s(mu=%.3f, phi=%.3f, sigma=%.3f)" % args
+        return '%s.%s(mu=%.3f, phi=%.3f, sigma=%.3f)' % args
 
 
 class Glicko2(object):
@@ -71,10 +70,10 @@ class Glicko2(object):
         """The original form is `g(RD)`. This function reduces the impact of
         games as a function of an opponent's RD.
         """
-        return 1 / math.sqrt(1 + (3 * rating.phi ** 2) / (math.pi ** 2))
+        return 1. / math.sqrt(1 + (3 * rating.phi ** 2) / (math.pi ** 2))
 
     def expect_score(self, rating, other_rating, impact):
-        return 1.0 / (1 + math.exp(-impact * (rating.mu - other_rating.mu)))
+        return 1. / (1 + math.exp(-impact * (rating.mu - other_rating.mu)))
 
     def determine_sigma(self, rating, difference, variance):
         """Determines new sigma."""
@@ -142,7 +141,7 @@ class Glicko2(object):
             variance_inv += impact ** 2 * expected_score * (1 - expected_score)
             difference += impact * (actual_score - expected_score)
         difference /= variance_inv
-        variance = 1.0 / variance_inv
+        variance = 1. / variance_inv
         # Step 5. Determine the new value, Sigma', ot the sigma. This
         #         computation requires iteration.
         sigma = self.determine_sigma(rating, difference, variance)
@@ -150,16 +149,14 @@ class Glicko2(object):
         #         value, Phi*.
         phi_star = math.sqrt(rating.phi ** 2 + sigma ** 2)
         # Step 7. Update the rating and RD to the new values, Mu' and Phi'.
-        phi = 1 / math.sqrt(1 / phi_star ** 2 + 1 / variance)
+        phi = 1. / math.sqrt(1 / phi_star ** 2 + 1 / variance)
         mu = rating.mu + phi ** 2 * (difference / variance)
         # Step 8. Convert ratings and RD's back to original scale.
         return self.scale_up(self.create_rating(mu, phi, sigma))
 
     def rate_1vs1(self, rating1, rating2, drawn=False):
-        return (
-            self.rate(rating1, [(DRAW if drawn else WIN, rating2)]),
-            self.rate(rating2, [(DRAW if drawn else LOSS, rating1)]),
-        )
+        return (self.rate(rating1, [(DRAW if drawn else WIN, rating2)]),
+                self.rate(rating2, [(DRAW if drawn else LOSS, rating1)]))
 
     def quality_1vs1(self, rating1, rating2):
         expected_score1 = self.expect_score(rating1, rating2, self.reduce_impact(rating1))

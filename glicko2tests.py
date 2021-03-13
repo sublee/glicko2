@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from glicko2 import DRAW, LOSS, WIN, Glicko2
+from glicko2 import Glicko2, WIN, DRAW, LOSS
 
 
 class almost(object):
+
     def __init__(self, val, precision=3):
         self.val = val
         self.precision = precision
@@ -10,8 +11,8 @@ class almost(object):
     def almost_equals(self, val1, val2):
         if round(val1, self.precision) == round(val2, self.precision):
             return True
-        fmt = "%.{0}f".format(self.precision)
-        mantissa = lambda f: int((fmt % f).replace(".", ""))
+        fmt = '%.{0}f'.format(self.precision)
+        mantissa = lambda f: int((fmt % f).replace('.', ''))
         return abs(mantissa(val1) - mantissa(val2)) <= 1
 
     def __eq__(self, other):
@@ -20,9 +21,8 @@ class almost(object):
                 return False
         except AttributeError:
             pass
-        return self.almost_equals(self.val.mu, other.mu) and self.almost_equals(
-            self.val.sigma, other.sigma
-        )
+        return (self.almost_equals(self.val.mu, other.mu) and
+                self.almost_equals(self.val.sigma, other.sigma))
 
     def __repr__(self):
         return repr(self.val)
@@ -35,6 +35,5 @@ def test_glickman_example():
     r3 = env.create_rating(1550, 100)
     r4 = env.create_rating(1700, 300)
     rated = env.rate(r1, [(WIN, r2), (LOSS, r3), (LOSS, r4)])
-    print("rated:", rated)
     # env.create_rating2(1464.06, 151.52, 0.05999)
     assert almost(rated) == env.create_rating(1464.051, 151.515, 0.05999)
