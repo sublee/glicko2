@@ -80,7 +80,7 @@ class Glicko2(object):
         return 1 / math.sqrt(1 + (3 * rating.phi ** 2) / (math.pi ** 2))
 
     def expect_score(self, rating, other_rating, impact):
-        return max(min(1. / (1 + math.exp(-impact * (rating.mu - other_rating.mu))), 0.999999), 0.0000001)
+        return 1. / (1 + math.exp(-impact * (rating.mu - other_rating.mu)))
 
     def determine_sigma(self, rating, difference, variance):
         """Determines new sigma."""
